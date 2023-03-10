@@ -12,6 +12,25 @@ import (
 	"google.golang.org/api/option"
 )
 
+func sendmail(srv gmail.Service, frommail string) {
+	temp := []byte("From: 'me'\r\n" +
+		"reply-to: evilcorp123456789@gmail.com\r\n" +
+		"To:  evilcorp123456789@gmail.com\r\n" +
+		"Subject: Feed My Otter, John \r\n" +
+		"remember to feed John")
+
+	var message gmail.Message
+
+	message.Raw = base64.StdEncoding.EncodeToString(temp)
+	message.Raw = strings.Replace(message.Raw, "/", "_", -1)
+	message.Raw = strings.Replace(message.Raw, "+", "-", -1)
+	message.Raw = strings.Replace(message.Raw, "=", "", -1)
+	_, err := srv.Users.Messages.Send("me", &message).Do()
+	if err != nil {
+		log.Fatalf("Unable to send. %v", err)
+	}
+}
+
 func main() {
 	ctx := context.Background()
 	b, err := ioutil.ReadFile("credentials.json")
